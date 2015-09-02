@@ -29,7 +29,7 @@ elif [ -f /usr/bin/sox ]; then
     sox=/usr/bin/sox
 fi
 if [ -z "$sox" ]; then
-    return
+    exit
 fi
 
 function pcm2asr()
@@ -57,8 +57,16 @@ function pcm2asr()
         file=$$.wav
     fi
     printf "$file: $ext\n" 1>&2
+    head='01234567890|1|'$ext'|u/开灯 开 灯/唱歌 唱 歌/放歌 放 歌/没事了 没 事 了/吃了没 吃 了 没|0|0'
+    head='01234567890|1|'$ext'|u/|0|0'
+    head=$(echo -n "$head" | iconv -f utf8 -t gbk)
+    headlen=$(echo -n "$head" | wc -c)
+    headlen=$((headlen + 1))
+    headhex=$(printf '%08x\n' $headlen | sed 's:[a-f0-9][a-f0-9]:\\x&:g;')
+    #echo "\$headlen = $headlen \$headhex = $headhex"
     ret=$( (
-    echo -ne '\x00\x00\x00\x1901234567890|1|'$ext'|u/|0|0\x00'
+    #echo -ne '\x00\x00\x00\x1901234567890|1|'$ext'|u/开灯 开 灯/唱歌 唱 歌/放歌 放 歌/没事了 没 事 了/吃了没 吃 了 没|0|0\x00'
+    echo -ne "$headhex$head\x00"
 
     size=$(du -b $file | cut -d$'\t' -f1)
     hex=$(printf '%08x\n' $bs | sed 's:[a-f0-9][a-f0-9]:\\x&:g;')
@@ -68,7 +76,7 @@ function pcm2asr()
         echo -ne "$hex"
         dd if=$file skip=$skip bs=1 count=$bs 2>/dev/null
         printf "send to asr:% 2dth % 6d % 6d ...\n" ${ii} $skip $bs 1>&2
-        sleep 1
+        sleep 0.5
     done
     if [ $skip -eq 0 ]; then
         last=$size
@@ -83,9 +91,10 @@ function pcm2asr()
     echo -ne "$hex"
     dd if=$file skip=$skip bs=1 count=$last 2>/dev/null
 
+    sleep 1;
     echo -ne '\x00\x00\x00\x00';
-    sleep 2;
-    ) | nc m2 65101 | cut -d\| -f1 | cut -c5-)
+    sleep 1;
+    ) | nc asr-1 65101 | cut -d\| -f1 | cut -c5-)
 
     if [ -e $tmp ]; then
         rm $tmp

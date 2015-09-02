@@ -5,17 +5,25 @@ export LANGUAGE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 export PS1='\u@\h:\w\$ '
-export GRAILS_HOME=~/tools/ggts-bundle/grails-2.4.3/
+export GRAILS_HOME=~/tools/ggts-bundle/grails-2.4.3
 export PATH=$PATH:~/bin:$GRAILS_HOME/bin
+alias grails='grails --plain-output'
 
 alias m0='ssh m0'
 alias m1='ssh m1'
 alias m2='ssh m2'
+alias rl='ssh build-1'
+alias rw='ssh root@jw'
 alias ls='ls --color'
 alias  l='ls -l'
 alias ll='ls -la'
 alias grep='grep --color'
 alias cdw='cd ~/work/dsfcpp/src'
+alias RS='redis-cli --raw -h m1'
+
+#for strace & ltrace
+alias stracee=dtruss
+alias ltracee=dtruss
 
 #for tair
 export TBLIB_ROOT=~/work/TBLIB/
@@ -28,6 +36,8 @@ export JAVA_HOME=`/usr/libexec/java_home`
 
 ulimit -c unlimited
 ulimit -n 4096
+
+source ~/.git-completion.bash
 
 set -o vi
 
@@ -46,9 +56,9 @@ function doGrep()
         if [ $# -gt 1 ]; then
                 dir=$*
         fi
-#       echo "\$# = $#: \$cmd='$cmd' \$opt='$opt', \$arg='$arg', \$dir='$dir'"
-#       echo "\$# = $#: grep '$opt' '$arg' '$dir'"
-#       echo "--------------------------------------------------"
+        #echo "\$# = $#: \$cmd='$cmd' \$opt='$opt', \$arg='$arg', \$dir='$dir'"
+        #echo "\$# = $#: grep '$opt' '$arg' '$dir'"
+        #echo "--------------------------------------------------"
         grep "$opt" "$arg" $dir
 }
 
@@ -96,11 +106,11 @@ alias Fwi="doFind Fwi -wi $*"
 function cl()
 {
         local dir=${1:-.}
-        find $dir -name '*.c'   \
-                -o -name '*.cpp'        \
-                -o -name '*.cxx'        \
-                -o -name '*.cc'        \
-                -o -name '*.h'        \
+        find $dir -name '*.c'     \
+                -o -name '*.cpp'  \
+                -o -name '*.cxx'  \
+                -o -name '*.cc'   \
+                -o -name '*.h'    \
                 -o -name '*.hpp' | sort
 }
 function cw()
@@ -149,7 +159,10 @@ alias cgiwl=cgwli
 #
 function jl()
 {
-        find $1 -name '*.java'        \
+        local dir=${1:-.}
+        find $dir -name '*.java'    \
+                -o -name '*.groovy' \
+                -o -name '*.gsp'    \
                 -o -name '*.xml' | sort
 }
 
@@ -180,5 +193,8 @@ function g2u()
     iconv -f gbk -t utf8 $*
 }
 
-#THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
+# the Groovy enVironment Manager
+# THIS MUST BE AT THE END OF THE FILE FOR GVM TO WORK!!!
+#
 [[ -s "/Users/et.c/.gvm/bin/gvm-init.sh" ]] && source "/Users/et.c/.gvm/bin/gvm-init.sh"
+

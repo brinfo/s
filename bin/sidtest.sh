@@ -26,9 +26,15 @@ function opu2sid()
     fi
 
     ext=$(echo $file | grep -o '[^.]*$')
-    if [ $ext != "opu" ]; then
+    if [ $ext = "opu" ]; then
+        false
+    else
+    if [ $ext = "pcm" ]; then
+        false
+    else
         echo "no $ext file."
         return
+    fi
     fi
 
     echo "test ${n}th file in $users: $file"

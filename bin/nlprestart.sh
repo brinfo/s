@@ -2,9 +2,13 @@
 
 nlphome="/home/admin/NLPServer"
 
+pid=$(ps axf | grep java | grep libzl | grep '^[ 0-9]*' -o)
 cd $nlphome
-sudo kill $(ps axf | grep java | grep libzl | grep '^[ 0-9]*' -o)
-sudo -u admin nohup ./zl.sh &
-sleep 2
-sudo -u admin tail -n 50 nohup.out
+echo "kill ($pid)"
+if [ -n "$pid" ]; then
+    kill $(ps axf | grep java | grep libzl | grep '^[ 0-9]*' -o)
+fi
+nohup ./zl.sh >>nohup.out 2>&1 &
+sleep 3
+tail -n 20 nohup.out
 

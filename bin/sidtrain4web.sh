@@ -1,6 +1,7 @@
 #!/bin/bash
 
 mysql="mysql -uroot -proot -hm1 speechcms"
+wavdir='/home/admin/asr_recorder/'
 
 users="yj jn yt wj zl"
 usern=$(echo $users | tr ' ' $'\n' | wc -l)
@@ -14,11 +15,12 @@ while read user wavs; do
     echo "($user) -> ($wavs)"
     for wav in $wavs; do
         name=$(basename $wav .wav)
-        dd if=$wav of=$name.pcm  skip=44 bs=1
+        dd if=$wavdir/$wav of=$name.pcm  skip=44 bs=1
         opu2pcm $name.pcm $name.opu
     done
     opus=$(echo "$wavs" | sed 's:wav:opu:g')
     echo "($user) -> ($opus)"
+    sidtrain.sh $user $opus
 done
 
 exit

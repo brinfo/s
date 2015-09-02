@@ -1,27 +1,20 @@
 #!/bin/bash
 
-nlp="nc 192.168.1.68 8313"
-nlp="nc localhost 8313"
+. ~/bin/function.sh
 
 function nlptest()
 {
     local txt=$(echo "$1" | cut -d \| -f1)
     local dom=$(echo "$1" | cut -d \| -f2)
-    local t0=$(date +%s)
+    local qry=$(echo "$1" | cut -d \| -f3)
+    local t0=$(date +%s%3N)
 
-    if [ "$1" = "$txt" ]; then
-        dom=""
-    fi
-    echo -n '"'$txt'" "'$dom'" -> '
-    local t1=$(date +%s)
-    local cost=$(($t1 - $t0))
-    local out=$(echo '{"queryDomain":"'$dom'","querySent":"'$txt'"}' | $nlp)
-    echo "$out, cost ${cost}s"
+    echo dsftest nlp "$1" | sed 's:":\\\":g; s:{:\\\{:g; s:}:\\\}:g;' | ssh et.c@build-1  2>/dev/null
 }
 
 if [ $# -eq 1 ]; then
-    if [ -f $1 ]; then
-        file=$1
+    if [ -f "$1" ]; then
+        file="$1"
         while read line; do
             if [ -n "$line" ]; then
                 nlptest "$line"
